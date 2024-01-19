@@ -1,0 +1,12 @@
+targets:
+  - target1:
+      address: asdfa
+      type: tcp
+
+  - target2:
+      address: asdfasd
+      type: http
+
+  - target3:
+      address: asdfasdsssssss
+      type: tcp
