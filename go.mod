@@ -1,4 +1,4 @@
-module check-from-node-exporter
+module probe-from-node-exporter
 
 go 1.21.6
 

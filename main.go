@@ -10,7 +10,7 @@ import (
 // Target represents the structure of the YAML data
 type Target struct {
 	Address string `yaml:"address"`
-	Type string `yaml:"type"`
+	Type    string `yaml:"type"`
 }
 
 // config represents the dynamic expansion of targets
