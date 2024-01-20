@@ -18,6 +18,10 @@ type Config struct {
 	Targets []map[string]Target `yaml:"targets"`
 }
 
+func worker(address string, probeType string) {
+
+}
+
 func main() {
 	// Read YAML file
 	data, err := os.ReadFile("config.yaml")

@@ -1,14 +1,8 @@
-package check
+package probe
 
 import (
-	"net"
 	"regexp"
 )
-
-func isValidIPAddress(input string) bool {
-	_, err := net.ResolveIPAddr("ip", input)
-	return err == nil
-}
 
 func isValidIP(address string) bool {
 	ipHostPattern := regexp.MustCompile(`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}+$`)

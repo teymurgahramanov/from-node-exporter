@@ -1,5 +1,5 @@
-module probe-from-node-exporter
+module github.com/teymurgahramanov/from-node-exporter
 
 go 1.21.6
 
-require gopkg.in/yaml.v3 v3.0.1 // indirect
+require gopkg.in/yaml.v3 v3.0.1
