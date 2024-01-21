@@ -67,10 +67,11 @@ func probeHTTP(address string) bool {
 	}
 }
 
-func dispatcher(target string, module string, address string, interval int) bool {
+func worker(target string, module string, address string, interval int) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	logMessageProbeSuccess := fmt.Sprintf("%v is UP",target)
 	logMessageProbeFailure := fmt.Sprintf("%v is DOWN",target)
+	logMessageWrongModule := fmt.Sprintf("Wrong module for %v",target)
 	
 	switch module {
 	case "tcp":
@@ -98,7 +99,7 @@ func dispatcher(target string, module string, address string, interval int) bool
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
 	default:
-		logger.Error("Wrong module")
+		logger.Error(logMessageWrongModule)
 		return false
 	}
 }
@@ -137,7 +138,7 @@ func main() {
 			go func(target string, module string, address string, interval int) {
 				defer wg.Done()
 				logger.Info(fmt.Sprintf("Starting probe %v on %v using module %v for every %v seconds",target,address,strings.ToUpper(module),interval))
-				dispatcher(target, module, address, interval)
+				worker(target, module, address, interval)
 			}(key, value.Type, value.Address, value.Interval)
 		}
 	}
