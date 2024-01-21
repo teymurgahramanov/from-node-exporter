@@ -1,15 +1,15 @@
-package probe
+package probes
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"time"
 )
 
-func probeTCP(host string, port int) bool {
-	address := fmt.Sprintf("%s:%d", host, port)
+func probeTCP(address string) bool {
 	conn, err := net.DialTimeout("tcp", address, 2*time.Second)
 	if err != nil {
+		log.Println("Error:", err)
 		return false
 	}
 	defer conn.Close()

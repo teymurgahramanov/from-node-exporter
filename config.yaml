@@ -1,12 +1,8 @@
 targets:
   - target1:
-      address: asdfa
+      address: 192.168.000.1
       type: tcp
 
-  - target2:
-      address: asdfasd
+  - target1:
+      address: htt://google.co
       type: http
-
-  - target3:
-      address: asdfasdsssssss
-      type: tcp
