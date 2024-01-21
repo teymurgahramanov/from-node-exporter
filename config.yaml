@@ -1,8 +1,10 @@
 targets:
-  - target1:
-      address: 192.168.000.1
-      type: tcp
+  - AAA:
+      address: 192.168.0.1:80
+      type: tcpp
+      interval: 30
 
-  - target1:
-      address: htt://google.co
+  - BBB:
+      address: htt://google.com
       type: http
+      interval: 5

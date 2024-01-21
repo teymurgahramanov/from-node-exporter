@@ -6,16 +6,20 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/yaml.v3"
 )
 
 // Target represents the structure of the YAML data
 type Target struct {
+	Type string `yaml:"type"`
 	Address string `yaml:"address"`
-	Type    string `yaml:"type"`
+	Interval int `yaml:"interval"`
 }
 
 // config represents the dynamic expansion of targets
@@ -24,27 +28,14 @@ type Config struct {
 }
 
 var (
-	probeSuccess = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "probe_success_total",
-			Help: "Total number of successful probes",
+	probeStatus = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "probe_status",
+			Help: "Current status of the probe (1 for success, 0 for failure)",
 		},
-		[]string{"target", "probeType"},
-	)
-
-	probeFailure = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "probe_failure_total",
-			Help: "Total number of failed probes",
-		},
-		[]string{"target", "probeType"},
+		[]string{"target", "module"},
 	)
 )
-
-func init() {
-	prometheus.MustRegister(probeSuccess)
-	prometheus.MustRegister(probeFailure)
-}
 
 func probeTCP(address string) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -76,72 +67,81 @@ func probeHTTP(address string) bool {
 	}
 }
 
-func dispatch(target string, address string, probeType string) bool {
+func dispatcher(target string, module string, address string, interval int) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	/*
-		1. Check probeType and use apr. function
-			1.1 Write metric
-			1.2 Repeat fumction
-	*/
-	switch probeType {
+	logMessageProbeSuccess := fmt.Sprintf("%v is UP",target)
+	logMessageProbeFailure := fmt.Sprintf("%v is DOWN",target)
+	
+	switch module {
 	case "tcp":
-		success := probeTCP(address)
-		if success {
-			probeSuccess.WithLabelValues(target, probeType).Inc()
-		} else {
-			probeFailure.WithLabelValues(target, probeType).Inc()
+		for {
+			result := probeTCP(address)
+			if result {
+				probeStatus.WithLabelValues(target, module).Set(1)
+				logger.Info(logMessageProbeSuccess)
+			} else {
+				probeStatus.WithLabelValues(target, module).Set(0)
+				logger.Info(logMessageProbeFailure)
+			}
+			time.Sleep(time.Duration(interval) * time.Second)
 		}
-		return success
 	case "http":
-		success := probeHTTP(address)
-		if success {
-			probeSuccess.WithLabelValues(target, probeType).Inc()
-		} else {
-			probeFailure.WithLabelValues(target, probeType).Inc()
+		for {
+			result := probeHTTP(address)
+			if result {
+				probeStatus.WithLabelValues(target, module).Set(1)
+				logger.Info(logMessageProbeSuccess)
+			} else {
+				probeStatus.WithLabelValues(target, module).Set(0)
+				logger.Info(logMessageProbeFailure)
+			}
+			time.Sleep(time.Duration(interval) * time.Second)
 		}
-		return success
 	default:
-		logger.Error("Unknown probe type")
+		logger.Error("Wrong module")
 		return false
 	}
 }
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	// Read YAML file
 	data, err := os.ReadFile("config.yaml")
 	if err != nil {
-		panic(err)
+		logger.Error(fmt.Sprint(err))
 	}
 
 	// Unmarshal YAML data into config
 	var config Config
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		panic(err)
+		logger.Error(fmt.Sprint(err))
 	}
+
+	promRegistry := prometheus.NewRegistry()
+	prometheus.DefaultRegisterer = promRegistry
+	prometheus.DefaultGatherer = promRegistry
+	prometheus.MustRegister(probeStatus)
+	
+	go func() {
+		http.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
+		http.ListenAndServe(":8080", nil)
+	}()
+	
+	var wg sync.WaitGroup
 
 	// Access and print values
 	for _, targetMap := range config.Targets {
 		for key, value := range targetMap {
-			fmt.Printf("Target: %s\n", key)
-			fmt.Printf("Address: %s\n", value.Address)
-			fmt.Printf("Type: %s\n", value.Type)
-			fmt.Printf("Result: %t\n", dispatch(key, value.Address, value.Type))
-			http.Handle("/metrics", promhttp.Handler())
-			go func() {
-				logger.Error(http.ListenAndServe(":8080", nil))
-			}()
-			dispatch(key, value.Address, value.Type)
+			wg.Add(1) // Increment the wait group for each new goroutine
+			go func(target string, module string, address string, interval int) {
+				defer wg.Done()
+				logger.Info(fmt.Sprintf("Starting probe %v on %v using module %v for every %v seconds",target,address,strings.ToUpper(module),interval))
+				dispatcher(target, module, address, interval)
+			}(key, value.Type, value.Address, value.Interval)
 		}
 	}
-	func main() {
-		logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-		http.Handle("/metrics", promhttp.Handler())
-		go func() {
-			logger.Error(http.ListenAndServe(":8080", nil))
-		}()
 	
-		// Example usage
-		dispatch("example", "localhost:8080", "http")
-	}
+	// Wait for all the goroutines to finish
+	wg.Wait()
 }

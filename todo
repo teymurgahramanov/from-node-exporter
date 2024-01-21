@@ -1,0 +1,4 @@
++ make prom boolean
++ add custom intrvals
+- add custom status ok for http
++ add goroutine for each check
