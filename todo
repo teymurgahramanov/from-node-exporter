@@ -1,9 +1,0 @@
-+ make prom boolean
-+ add custom intrvals
-+ add goroutine for each check
-- add custom status ok for http
-- add redirect for http
-- separate packages
-- write helm chart
-- write readme
-- use env variables

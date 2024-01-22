@@ -18,5 +18,3 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )
-
-replace github.com/teymurgahramanov/from-node-exporter/probes => ./probes
