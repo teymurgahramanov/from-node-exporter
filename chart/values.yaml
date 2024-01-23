@@ -1,0 +1,38 @@
+image:
+  repository: "" # Default is teymurgahramanov/from-node-exporter
+  pullPolicy: "" # Default is IfNotPresent
+  tag: "" # Default is "{{ $.Chart.AppVersion }}"
+
+targets.yaml:
+# List of targets to probe. Example:
+#  - target1:
+#      address: 192.168.0.1:80
+#      type: tcp
+#
+#  - target2:
+#      address: server.contoso.com:8080
+#      type: tcp
+#
+#  - target3:
+#      address: https://example.com
+#      type: http
+
+labels: {}
+# Common labels
+# Default label for all objects is app: {{ .Release.Name }}
+annotations: {}
+# Common annotations
+daemonsetAnnotations: {}
+ # If you are using https://github.com/stakater/Reloader
+ # reloader.stakater.com/auto: "true"
+podAnnotations: {}
+ # prometheus.io/scrape: "true"
+ # prometheus.io/port: "8080"
+ # prometheus.io/path: "/metrics"
+configMapAnnotations: {}
+
+tolerations: []
+ # - effect: NoSchedule
+ #   operator: Exists
+nodeSelector: {}
+resources: {}

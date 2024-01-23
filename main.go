@@ -89,10 +89,7 @@ func main() {
 	if metricsListenPath == "" {
 		metricsListenPath = "/metrics"
 	}
-	targetsFileName := os.Getenv("TARGETS_FILE_NAME")
-	if targetsFileName == "" {
-		targetsFileName = "targets.yaml"
-	}
+	targetsFileName := "targets.yaml"
 
 	data, err := os.ReadFile(targetsFileName)
 	if err != nil {
