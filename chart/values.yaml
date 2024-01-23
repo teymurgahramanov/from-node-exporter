@@ -17,15 +17,17 @@ targets.yaml:
 #      address: https://example.com
 #      type: http
 
+env: {}
+# Environment variables
+
 labels: {}
 # Common labels
-# Default label for all objects is app: {{ .Release.Name }}
 annotations: {}
 # Common annotations
 daemonsetAnnotations: {}
  # If you are using https://github.com/stakater/Reloader
  # reloader.stakater.com/auto: "true"
-podAnnotations: {}
+podAnnotations:
  # prometheus.io/scrape: "true"
  # prometheus.io/port: "8080"
  # prometheus.io/path: "/metrics"
