@@ -1,40 +1,44 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-{{- include "common.metadata" ( list $ "" ) | nindent 2 }}
+{{- include "common.metadata" . | nindent 2 }}
+{{- if .Values.daemonsetAnnotations }}
+  {{- toYaml .Values.daemonsetAnnotations | nindent 4 }}
+{{- end }}
 spec:
   selector:
     matchLabels:
-      app: {{ include "object.name" }}
+      {{- include "common.labels" . | nindent 6 }}
+    {{- if .Values.podLabels }}
+      {{- toYaml .Values.podLabels | nindent 6 }}
+    {{- end }}
   template:
     metadata:
       labels:
-        app: {{ include "object.name" }}
         {{- include "common.labels" . | nindent 8 }}
+      {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+      {{- end }}
       annotations:
-    {{- if .Values.pod.annotations }}
-      {{- toYaml .Values.podAnnotations | nindent 8 }}
-    {{- end }}
+      {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 6 }}
+      {{- end }}
     spec:
       containers:
-        - name: {{ include "object.name" }}
-          image: {{ .Values.image.repository | default "teymurgahramanov/from-node-exporter" }}:{{ .Values.image.tag | default {{ $.Chart.AppVersion }} }}
+        - name: {{ include "object.name" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default $.Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: default
-              containerPort: {{ .Values.app.listenPort }}
-          {{- if .Values.env }}
+            - name: metrics
+              containerPort: {{ .Values.config.exporter.metricsListenPort }}
           env:
+          {{- if .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: time
-              mountPath: /etc/localtime
-          {{- range $key, $subKey := .Values.configMap }}
             - name: configmap
-              mountPath: {{ $subKey.mountPath }}
-              subPath: {{ $key }}
-          {{- end }}
+              mountPath: /
+              subPath: config.yaml
           {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
           {{- end }}
@@ -43,9 +47,9 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
       volumes:
-        - name: time
-          hostPath:
-            path: /etc/localtime
         - name: configmap
           configMap:
-            name: {{ include "object.name" }}
+            name: {{ include "object.name" . }}
+      {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+      {{- end }}

@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -15,10 +14,21 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Target struct {
-	Type string `yaml:"type"`
+type Configuration struct {
+	Targets []map[string]TargetConfig `yaml:"targets"`
+	Exporter ExporterConfig `yaml:"exporter"`
+}
+
+type TargetConfig struct {
 	Address string `yaml:"address"`
+	Type string `yaml:"type"`
 	Interval int `yaml:"interval"`
+}
+
+type ExporterConfig struct {
+	MetricsListenPath string `yaml:"metricsListenPath"`
+	MetricsListenPort int `yaml:"metricsListenPort"`
+	DefaultProbeInterval int `yaml:"defaultProbeInterval"`
 }
 
 var (
@@ -81,23 +91,15 @@ func worker(target string, module string, address string, interval int) bool {
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	metricsListenPort := os.Getenv("METRICS_LISTEN_PORT")
-	if metricsListenPort == "" {
-		metricsListenPort = "8080"
-	}
-	metricsListenPath := os.Getenv("METRICS_LISTEN_PATH")
-	if metricsListenPath == "" {
-		metricsListenPath = "/metrics"
-	}
-	targetsFileName := "targets.yaml"
+	targetsFileName := "config.yaml"
 
 	data, err := os.ReadFile(targetsFileName)
 	if err != nil {
 		logger.Error(fmt.Sprint(err))
 	}
 
-	var targetEntries []map[string]Target
-	err = yaml.Unmarshal(data, &targetEntries)
+	var config Configuration
+	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		logger.Error(fmt.Sprint(err))
 	}
@@ -108,20 +110,20 @@ func main() {
 	prometheus.MustRegister(probeStatus)
 	
 	go func() {
-		http.Handle(metricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
-		http.ListenAndServe(":"+metricsListenPort, nil)
+		http.Handle(config.Exporter.MetricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
+		http.ListenAndServe(":"+fmt.Sprint(config.Exporter.MetricsListenPort), nil)
 	}()
 	
 	var wg sync.WaitGroup
 
-	for _, entry := range targetEntries {
+	for _, entry := range config.Targets {
 		for key, value := range entry {
 			wg.Add(1)
 			go func(target string, module string, address string, interval int) {
 				defer wg.Done()
-				logger.Info(fmt.Sprintf("Starting probe %v on %v using module %v for every %v seconds",target,address,strings.ToUpper(module),interval))
+				logger.Info(fmt.Sprintf("Starting probe %v on %v using module %v for every %v seconds",target,address,module,interval))
 				if interval == 0 {
-					interval = 22
+					interval = config.Exporter.DefaultProbeInterval
 				}
 				worker(target, module, address, interval)
 			}(key, value.Type, value.Address, value.Interval)

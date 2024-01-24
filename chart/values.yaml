@@ -1,9 +1,14 @@
 image:
-  repository: "" # Default is teymurgahramanov/from-node-exporter
-  pullPolicy: "" # Default is IfNotPresent
+  repository: teymurgahramanov/from-node-exporter
+  pullPolicy: IfNotPresent
   tag: "" # Default is "{{ $.Chart.AppVersion }}"
 
-targets.yaml:
+config:
+  exporter:
+    metricsListenPort: 8080
+    metricsListenPath: /metrics
+    defaultProbeInterval: 22
+  targets: {}
 # List of targets to probe. Example:
 #  - target1:
 #      address: 192.168.0.1:80
@@ -18,19 +23,22 @@ targets.yaml:
 #      type: http
 
 env: {}
-# Environment variables
 
-labels: {}
+labels:
+  zzz: asdfas
 # Common labels
-annotations: {}
+annotations:
+  asdfasdf: sdfa
 # Common annotations
-daemonsetAnnotations: {}
+daemonsetAnnotations: 
  # If you are using https://github.com/stakater/Reloader
- # reloader.stakater.com/auto: "true"
+  reloader.stakater.com/auto: "true"
+podLabels:
+  asdfasdf: asdfa
 podAnnotations:
- # prometheus.io/scrape: "true"
- # prometheus.io/port: "8080"
- # prometheus.io/path: "/metrics"
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
 configMapAnnotations: {}
 
 tolerations: []
@@ -38,3 +46,5 @@ tolerations: []
  #   operator: Exists
 nodeSelector: {}
 resources: {}
+volumes: {}
+volumeMounts: {}

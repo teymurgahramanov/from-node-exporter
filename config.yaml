@@ -1,0 +1,12 @@
+targets:
+  - test1:
+      address: localhost:8080
+      type: tcp
+  - test2:
+      address: localhost:8090
+      type: tcp
+
+exporter:
+  metricsListenPath: /metrics
+  metricsListenPort: 8080
+  defaultProbeInterval: 22
