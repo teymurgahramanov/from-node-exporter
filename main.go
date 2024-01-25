@@ -14,18 +14,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Configuration struct {
-	Targets []map[string]TargetConfig `yaml:"targets"`
-	Exporter ExporterConfig `yaml:"exporter"`
+type configuration struct {
+	Targets []map[string]targetConfig `yaml:"targets"`
+	Exporter exporterConfig `yaml:"exporter"`
 }
 
-type TargetConfig struct {
+type targetConfig struct {
 	Address string `yaml:"address"`
 	Module string `yaml:"module"`
 	Interval int `yaml:"interval"`
 }
 
-type ExporterConfig struct {
+type exporterConfig struct {
 	MetricsListenPath string `yaml:"metricsListenPath"`
 	MetricsListenPort int `yaml:"metricsListenPort"`
 	DefaultProbeInterval int `yaml:"defaultProbeInterval"`
@@ -95,7 +95,7 @@ func main() {
 		logger.Error(fmt.Sprint(err))
 	}
 
-	var config Configuration
+	var config configuration
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		logger.Error(fmt.Sprint(err))
