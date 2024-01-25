@@ -27,7 +27,7 @@ app: {{ include "object.name" . }}
 name: {{ include "object.name" . }}
 namespace: {{ include "object.namespace" . }}
 labels:
-  {{ include "common.labels" . }}
+  {{ include "common.labels" . | nindent 2 }}
 annotations:
-  {{ include "common.annotations" . }}
+  {{ include "common.annotations" . | nindent 2 }}
 {{- end }}

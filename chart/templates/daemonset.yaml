@@ -21,7 +21,7 @@ spec:
       {{- end }}
       annotations:
       {{- if .Values.podAnnotations }}
-        {{- toYaml .Values.podAnnotations | nindent 6 }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
       containers:
@@ -31,10 +31,6 @@ spec:
           ports:
             - name: metrics
               containerPort: {{ .Values.config.exporter.metricsListenPort }}
-          env:
-          {{- if .Values.env }}
-            {{- toYaml .Values.env | nindent 12 }}
-          {{- end }}
           volumeMounts:
             - name: configmap
               mountPath: /

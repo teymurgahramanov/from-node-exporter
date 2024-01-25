@@ -121,10 +121,10 @@ func main() {
 			wg.Add(1)
 			go func(target string, module string, address string, interval int) {
 				defer wg.Done()
-				logger.Info(fmt.Sprintf("Starting probe %v on %v using module %v for every %v seconds",target,address,module,interval))
 				if interval == 0 {
 					interval = config.Exporter.DefaultProbeInterval
 				}
+				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v",target,address,interval,module))
 				worker(target, module, address, interval)
 			}(key, value.Type, value.Address, value.Interval)
 		}
