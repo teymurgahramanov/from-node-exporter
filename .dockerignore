@@ -1,4 +1,6 @@
 .Dockerfile
-README.md
-*.yaml
+.dockerignore
+.gitignore
+.github/
 chart/
+README.md

@@ -21,7 +21,7 @@ type Configuration struct {
 
 type TargetConfig struct {
 	Address string `yaml:"address"`
-	Type string `yaml:"type"`
+	Module string `yaml:"module"`
 	Interval int `yaml:"interval"`
 }
 
@@ -34,7 +34,7 @@ type ExporterConfig struct {
 var (
 	probeStatus = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "probe_status",
+			Name: "probe_success",
 			Help: "Current status of the probe (1 for success, 0 for failure)",
 		},
 		[]string{"target", "module"},
@@ -74,10 +74,8 @@ func worker(target string, module string, address string, interval int) bool {
 				probeStatus.WithLabelValues(target, module).Set(0)
 				if error != nil {
 					logger.Error(fmt.Sprintf(error.Error()))
-					return false
 				} else {
 					logger.Info(logMessageProbeFailure)
-					return false
 				}
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
@@ -90,7 +88,6 @@ func worker(target string, module string, address string, interval int) bool {
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-
 	targetsFileName := "config.yaml"
 
 	data, err := os.ReadFile(targetsFileName)
@@ -104,6 +101,16 @@ func main() {
 		logger.Error(fmt.Sprint(err))
 	}
 
+	if config.Exporter.MetricsListenPort == 0 {
+		config.Exporter.MetricsListenPort = 8080
+	}
+	if config.Exporter.MetricsListenPath == "" {
+		config.Exporter.MetricsListenPath = "/metrics"
+	}
+	if config.Exporter.DefaultProbeInterval == 0 {
+		config.Exporter.DefaultProbeInterval = 22
+	}
+	
 	promRegistry := prometheus.NewRegistry()
 	prometheus.DefaultRegisterer = promRegistry
 	prometheus.DefaultGatherer = promRegistry
@@ -126,7 +133,7 @@ func main() {
 				}
 				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v",target,address,interval,module))
 				worker(target, module, address, interval)
-			}(key, value.Type, value.Address, value.Interval)
+			}(key, value.Module, value.Address, value.Interval)
 		}
 	}
 	
