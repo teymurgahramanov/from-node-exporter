@@ -1,7 +1,7 @@
 FROM golang:1.21.6 AS build
 WORKDIR /app
 COPY . .
-RUN go get github.com/golang/lint/golint
+RUN go get golang.org/x/lint/golint
 RUN golint .
 RUN CGO_ENABLED=0 GOOS=linux go build
 
