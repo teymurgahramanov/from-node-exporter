@@ -26,11 +26,11 @@ spec:
     spec:
       containers:
         - name: {{ include "object.name" . }}
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default $.Chart.AppVersion }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.image.repository | default "teymurgahramanov/from-node-exporter" }}:{{ .Values.image.tag | default $.Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           ports:
             - name: metrics
-              containerPort: {{ .Values.config.exporter.metricsListenPort }}
+              containerPort: {{ .Values.config.exporter.metricsListenPort | default 8080 }}
           volumeMounts:
             - name: configmap
               mountPath: /
