@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// ProbeHTTP probes HTTP endpoint
+
 func ProbeHTTP(address string) (bool,error) {
 	resp, err := http.Get(address)
 	if err != nil {
