@@ -21,7 +21,7 @@ jobs:
 
       - name: Lint
         run: |
-          go get -u golang.org/x/lint/golint
+          apt install -y golint
           golint -set_exit_status ./...
 
       - name: Set up Docker Buildx
