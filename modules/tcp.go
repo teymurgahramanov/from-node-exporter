@@ -6,8 +6,8 @@ import (
 )
 
 // ProbeTCP is for probe TCP endpoints
-func ProbeTCP(address string, interval int) (bool,error) {
-	conn, err := net.DialTimeout("tcp", address, time.Duration(interval)/2*time.Second)
+func ProbeTCP(address string, timeout int) (bool,error) {
+	conn, err := net.DialTimeout("tcp", address, time.Duration(timeout)*time.Second)
 	if err != nil {
 		return false, err
 	}

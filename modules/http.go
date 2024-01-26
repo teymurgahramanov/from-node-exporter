@@ -7,13 +7,13 @@ import (
 )
 
 // ProbeHTTP is for probe HTTP endpoints
-func ProbeHTTP(address string, interval int) (bool,error) {
+func ProbeHTTP(address string, timeout int) (bool,error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{
 		Transport: tr,
-		Timeout: time.Duration(interval)/2*time.Second,
+		Timeout: time.Duration(timeout)*time.Second,
 	}
 	resp, err := client.Get(address)
 	if err != nil {

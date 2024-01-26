@@ -23,12 +23,14 @@ type targetConfig struct {
 	Address string `yaml:"address"`
 	Module string `yaml:"module"`
 	Interval int `yaml:"interval"`
+	Timeout int `yaml:"timeout"`
 }
 
 type exporterConfig struct {
 	MetricsListenPath string `yaml:"metricsListenPath"`
 	MetricsListenPort int `yaml:"metricsListenPort"`
 	DefaultProbeInterval int `yaml:"defaultProbeInterval"`
+	DefaultProbeTimeout int `yaml:"defaultProbeTimeout"`
 }
 
 var (
@@ -41,14 +43,13 @@ var (
 	)
 )
 
-func worker(target string, module string, address string, interval int) bool {
+func worker(target string, module string, address string, interval int, timeout int) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	logMessageWrongModule := fmt.Sprintf("Wrong module %v for %v",module,target)
 	
 	switch module {
 	case "tcp":
 		for {
-			result,error := modules.ProbeTCP(address,interval)
+			result,error := modules.ProbeTCP(address,timeout)
 			if result {
 				probeStatus.WithLabelValues(target, module).Set(1)
 			} else {
@@ -61,7 +62,7 @@ func worker(target string, module string, address string, interval int) bool {
 		}
 	case "http":
 		for {
-			result,error := modules.ProbeHTTP(address,interval)
+			result,error := modules.ProbeHTTP(address,timeout)
 			if result {
 				probeStatus.WithLabelValues(target, module).Set(1)
 			} else {
@@ -73,7 +74,7 @@ func worker(target string, module string, address string, interval int) bool {
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
 	default:
-		logger.Error(logMessageWrongModule,"target",target)
+		logger.Error("Wrong module","target",target)
 		return false
 	}
 }
@@ -102,7 +103,10 @@ func main() {
 	if config.Exporter.DefaultProbeInterval == 0 {
 		config.Exporter.DefaultProbeInterval = 22
 	}
-	
+	if config.Exporter.DefaultProbeTimeout == 0 {
+		config.Exporter.DefaultProbeTimeout = 5
+	}
+
 	promRegistry := prometheus.NewRegistry()
 	prometheus.DefaultRegisterer = promRegistry
 	prometheus.DefaultGatherer = promRegistry
@@ -118,15 +122,17 @@ func main() {
 	for _, entry := range config.Targets {
 		for key, value := range entry {
 			wg.Add(1)
-			go func(target string, module string, address string, interval int) {
+			go func(target string, module string, address string, interval int, timeout int) {
 				defer wg.Done()
-				if interval < 10 {
-					logger.Warn(fmt.Sprintf("Interval is empty or less than 10 seconds. Default interval %v seconds will be used.",config.Exporter.DefaultProbeInterval),"target",target)
+				if interval == 0 {
 					interval = config.Exporter.DefaultProbeInterval
 				}
-				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v",target,address,interval,module))
-				worker(target, module, address, interval)
-			}(key, value.Module, value.Address, value.Interval)
+				if timeout == 0 {
+					timeout = config.Exporter.DefaultProbeTimeout
+				}
+				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v with timeout of %v seconds.",target,address,interval,module,timeout))
+				worker(target, module, address, interval, timeout)
+			}(key, value.Module, value.Address, value.Interval, value.Timeout)
 		}
 	}
 	
