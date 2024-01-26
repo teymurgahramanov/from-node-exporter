@@ -33,7 +33,7 @@ spec:
               containerPort: {{ .Values.config.exporter.metricsListenPort | default 8080 }}
           volumeMounts:
             - name: configmap
-              mountPath: /
+              mountPath: /config.yaml
               subPath: config.yaml
           {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}

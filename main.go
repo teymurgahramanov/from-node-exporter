@@ -43,45 +43,37 @@ var (
 
 func worker(target string, module string, address string, interval int) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	logMessageProbeSuccess := fmt.Sprintf("%v is UP",target)
-	logMessageProbeFailure := fmt.Sprintf("%v is DOWN",target)
-	logMessageWrongModule := fmt.Sprintf("Wrong module for %v",target)
+	logMessageWrongModule := fmt.Sprintf("Wrong module %v for %v",module,target)
 	
 	switch module {
 	case "tcp":
 		for {
-			result,error := modules.ProbeTCP(address)
+			result,error := modules.ProbeTCP(address,interval)
 			if result {
 				probeStatus.WithLabelValues(target, module).Set(1)
-				logger.Info(logMessageProbeSuccess)
 			} else {
-				probeStatus.WithLabelValues(target, module).Set(0)
 				if error != nil {
-					logger.Error(fmt.Sprintf(error.Error()))
-				} else {
-					logger.Info(logMessageProbeFailure)
+					logger.Error(fmt.Sprintf(error.Error()),"target",target)
 				}
+				probeStatus.WithLabelValues(target, module).Set(0)
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
 	case "http":
 		for {
-			result,error := modules.ProbeHTTP(address)
+			result,error := modules.ProbeHTTP(address,interval)
 			if result {
 				probeStatus.WithLabelValues(target, module).Set(1)
-				logger.Info(logMessageProbeSuccess)
 			} else {
-				probeStatus.WithLabelValues(target, module).Set(0)
 				if error != nil {
-					logger.Error(fmt.Sprintf(error.Error()))
-				} else {
-					logger.Info(logMessageProbeFailure)
+					logger.Error(fmt.Sprintf(error.Error()),"target",target)
 				}
+				probeStatus.WithLabelValues(target, module).Set(0)
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
 	default:
-		logger.Error(logMessageWrongModule)
+		logger.Error(logMessageWrongModule,"target",target)
 		return false
 	}
 }
@@ -128,7 +120,8 @@ func main() {
 			wg.Add(1)
 			go func(target string, module string, address string, interval int) {
 				defer wg.Done()
-				if interval == 0 {
+				if interval < 10 {
+					logger.Warn(fmt.Sprintf("Interval is empty or less than 10 seconds. Default interval %v seconds will be used.",config.Exporter.DefaultProbeInterval),"target",target)
 					interval = config.Exporter.DefaultProbeInterval
 				}
 				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v",target,address,interval,module))
