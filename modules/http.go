@@ -7,7 +7,7 @@ import (
 )
 
 // ProbeHTTP is for probe HTTP endpoints
-func ProbeHTTP(address string, timeout int, okCode int) (bool,error) {
+func ProbeHTTP(address string, timeout int) (bool,error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -20,7 +20,7 @@ func ProbeHTTP(address string, timeout int, okCode int) (bool,error) {
 		return false, err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != okCode {
+	if resp.StatusCode != http.StatusOK {
 		return false, nil
 	} 
 	return true, nil

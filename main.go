@@ -24,7 +24,6 @@ type targetConfig struct {
 	Module string `yaml:"module"`
 	Interval int `yaml:"interval"`
 	Timeout int `yaml:"timeout"`
-	OkCode int `yaml:"okCode"`
 }
 
 type exporterConfig struct {
@@ -32,7 +31,6 @@ type exporterConfig struct {
 	MetricsListenPort int `yaml:"metricsListenPort"`
 	DefaultProbeInterval int `yaml:"defaultProbeInterval"`
 	DefaultProbeTimeout int `yaml:"defaultProbeTimeout"`
-	DefaultOkCode int `yaml:"defaultOkCode"`
 }
 
 var (
@@ -45,7 +43,7 @@ var (
 	)
 )
 
-func worker(target string, module string, address string, interval int, timeout int, okCode int) bool {
+func worker(target string, module string, address string, interval int, timeout int) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	
 	switch module {
@@ -64,7 +62,7 @@ func worker(target string, module string, address string, interval int, timeout 
 		}
 	case "http":
 		for {
-			result,error := modules.ProbeHTTP(address,timeout,okCode)
+			result,error := modules.ProbeHTTP(address,timeout)
 			if result {
 				probeStatus.WithLabelValues(target, module).Set(1)
 			} else {
@@ -108,9 +106,6 @@ func main() {
 	if config.Exporter.DefaultProbeTimeout == 0 {
 		config.Exporter.DefaultProbeTimeout = 5
 	}
-	if config.Exporter.DefaultOkCode == 0 {
-		config.Exporter.DefaultOkCode = 200
-	}
 
 	promRegistry := prometheus.NewRegistry()
 	prometheus.DefaultRegisterer = promRegistry
@@ -127,7 +122,7 @@ func main() {
 	for _, entry := range config.Targets {
 		for key, value := range entry {
 			wg.Add(1)
-			go func(target string, module string, address string, interval int, timeout int, okCode int) {
+			go func(target string, module string, address string, interval int, timeout int) {
 				defer wg.Done()
 				if interval == 0 {
 					interval = config.Exporter.DefaultProbeInterval
@@ -135,12 +130,9 @@ func main() {
 				if timeout == 0 {
 					timeout = config.Exporter.DefaultProbeTimeout
 				}
-				if okCode == 0 {
-					okCode = config.Exporter.DefaultOkCode
-				}
 				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v with timeout of %v seconds.",target,address,interval,module,timeout))
-				worker(target, module, address, interval, timeout, okCode)
-			}(key, value.Module, value.Address, value.Interval, value.Timeout, value.OkCode)
+				worker(target, module, address, interval, timeout)
+			}(key, value.Module, value.Address, value.Interval, value.Timeout)
 		}
 	}
 	
