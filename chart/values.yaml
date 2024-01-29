@@ -39,10 +39,11 @@ podAnnotations: {}
 configMapAnnotations: {}
 serviceMapAnnotations: {}
 
-tolerations: []
- # - effect: NoSchedule
- #   operator: Exists
 nodeSelector: {}
+affinity: {}
+tolerations: []
+#  - effect: NoSchedule
+#    operator: Exists
 resources: {}
 volumes: {}
 volumeMounts: {}
