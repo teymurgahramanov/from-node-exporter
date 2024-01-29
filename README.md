@@ -10,8 +10,16 @@ While there are other tools like the Blackbox Exporter, the Node Probe Exporter 
 
 - __Scope__: The Node Probe Exporter focuses exclusively on TCP and HTTP probes and is intentionally kept simple. Currently no plans are in place to add additional functionality or metrics, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
-## Install
-
-
-
 ## Usage
+###  1. Clone
+```
+git clone https://github.com/teymurgahramanov/from-node-exporter
+```
+### 2. Configure targets
+```
+helm upgrade --install from-node-exporter ./chart/
+```
+### 3. Install
+```
+helm upgrade --install from-node-exporter ./chart/
+```
