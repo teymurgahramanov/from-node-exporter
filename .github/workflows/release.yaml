@@ -49,3 +49,4 @@ jobs:
           artifacts: "bin/from-node-exporter"
           allowUpdates: true
           artifactErrorsFailBuild: true
+          makeLatest: true
