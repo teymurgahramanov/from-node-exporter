@@ -2,43 +2,33 @@ image:
   repository: teymurgahramanov/from-node-exporter
   pullPolicy: IfNotPresent
   tag: "" # Default is "{{ $.Chart.AppVersion }}"
-
 config:
   exporter:
+# Default values:
     metricsListenPort: 8080
     metricsListenPath: /metrics
     defaultProbeInterval: 22
   targets: {}
 # List of targets to probe. Example:
 #    - target1:
-#        address: 192.168.0.1:80
-#        type: tcp
-#
+#        address: api.example.com:8080
+#        module: tcp
+#        timeout: 10
 #    - target2:
-#        address: server.contoso.com:8080
-#        type: tcp
-#
-#    - target3:
 #        address: https://example.com
-#        type: http
-
+#        module: http
+#        interval: 60
+#        timeout: 5
 serviceType: ClusterIP
-
 labels: {}
 # Common labels
 annotations: {}
 # Common annotations
-daemonsetAnnotations: 
-# If you are using https://github.com/stakater/Reloader
-#  reloader.stakater.com/auto: "true"
+daemonsetAnnotations: {}
 podLabels: {}
 podAnnotations: {}
-#  prometheus.io/scrape: "true"
-#  prometheus.io/port: "8080"
-#  prometheus.io/path: "/metrics"
 configMapAnnotations: {}
 serviceMapAnnotations: {}
-
 nodeSelector: {}
 affinity: {}
 tolerations: []

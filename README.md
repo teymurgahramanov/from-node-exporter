@@ -1,14 +1,14 @@
 # From-node exporter
 
-The From-Node Exporter for Prometheus is designed to probe external endpoints from each Kubernetes node.
+The From-Node Exporter for Prometheus is designed to probe the accessibility of external endpoints from each node of the Kubernetes cluster over TCP, HTTP, and ~~ICMP~~.
 
-## Why From-node Exporter?
+## How will it be useful?
 
-While there are other tools like the Blackbox Exporter, the Node Probe Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node.
+While there are other tools like the Blackbox Exporter, the Node Probe Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
 
 ## Current state
 
-The Node Probe Exporter focuses exclusively on TCP and HTTP probes and is intentionally kept simple. Currently no plans are in place to add additional functionality or metrics, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
+The Node Probe Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics, except ICMP probe, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
 ## Usage
 
@@ -20,12 +20,39 @@ git clone https://github.com/teymurgahramanov/from-node-exporter
 
 ### 2. Configure targets
 
+Configure targets using the Helm values file. Refer to [values.yaml](./chart/values.yaml). Example:
 ```
-helm upgrade --install from-node-exporter ./chart/
+config:
+  targets:
+    - target1:
+        address: api.example.com:8080
+        module: tcp
+        timeout: 10
+    - target2:
+        address: https://example.com
+        module: http
+        interval: 60
+        timeout: 5
 ```
 
-### 3. Install
+### 3. Install Helm chart
 
 ```
-helm upgrade --install from-node-exporter ./chart/
+# I'm sure you know how
+```
+
+### 3. Configure Prometheus
+
+Configuration snippet will be provided in Helm output upon the chart installation. Example:
+```
+- job_name: from-node-exporter
+  kubernetes_sd_configs:
+    - role: endpoints
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_endpoints_name]
+    regex: from-node-exporter
+    action: keep
+  - source_labels: [__meta_kubernetes_endpoint_node_name]
+    action: replace
+    target_label: instance
 ```
