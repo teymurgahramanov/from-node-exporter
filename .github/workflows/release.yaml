@@ -1,4 +1,4 @@
-name: Release
+name: Pre-Release
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  pre-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -39,17 +39,7 @@ jobs:
           tags: ${{ github.repository }}:${{ github.ref_name }}
 
       - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: ${{ github.ref_name }}
-          body: ""
-          draft: false
-          prerelease: false
-
-      - uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1
         with:
           name: ${{ github.ref_name }}
           tag: ${{ github.ref_name }}
