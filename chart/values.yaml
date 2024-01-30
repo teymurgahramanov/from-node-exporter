@@ -1,0 +1,39 @@
+image:
+  repository: teymurgahramanov/from-node-exporter
+  pullPolicy: IfNotPresent
+  tag: "" # Default is "{{ $.Chart.AppVersion }}"
+config:
+  exporter:
+# Default values:
+    metricsListenPort: 8080
+    metricsListenPath: /metrics
+    defaultProbeInterval: 22
+  targets: {}
+# List of targets to probe. Example:
+#    - target1:
+#        address: api.example.com:8080
+#        module: tcp
+#        timeout: 10
+#    - target2:
+#        address: https://example.com
+#        module: http
+#        interval: 60
+#        timeout: 5
+serviceType: ClusterIP
+labels: {}
+# Common labels
+annotations: {}
+# Common annotations
+daemonsetAnnotations: {}
+podLabels: {}
+podAnnotations: {}
+configMapAnnotations: {}
+serviceMapAnnotations: {}
+nodeSelector: {}
+affinity: {}
+tolerations: []
+#  - effect: NoSchedule
+#    operator: Exists
+resources: {}
+volumes: {}
+volumeMounts: {}
