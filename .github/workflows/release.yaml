@@ -1,4 +1,4 @@
-name: Pre-Release
+name: Release
 
 on:
   workflow_call:
@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  pre-release:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
