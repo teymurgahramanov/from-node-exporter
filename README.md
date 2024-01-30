@@ -4,11 +4,11 @@ The From-Node Exporter for Prometheus is designed to probe the accessibility of 
 
 ## How will it be useful?
 
-While there are other tools like the Blackbox Exporter, the Node Probe Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
+While there are other tools like the Blackbox Exporter, the From-node Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
 
 ## Current state
 
-The Node Probe Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics, except ICMP probe, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
+The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics, except ICMP probe, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
 ## Usage
 ### 1. Clone
