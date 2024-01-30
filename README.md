@@ -62,7 +62,7 @@ Configuration snippet will be provided in Helm output upon the chart installatio
 ```
 https://github.com/teymurgahramanov/from-node-exporter/releases/download/v0.1.0/from-node-exporter
 ```
-2. Configure targets in __config.yaml__
+2. Configure targets in __config.yaml__. Example:
 ```
 config:
   targets:
