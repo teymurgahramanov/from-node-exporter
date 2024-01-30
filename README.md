@@ -21,7 +21,7 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 ### 1. Clone
 
 ```
-git clone https://github.com/teymurgahramanov/from-node-exporter
+git clone --depth 1 --branch v0.1.0 https://github.com/teymurgahramanov/from-node-exporter
 ```
 
 ### 2. Configure targets
