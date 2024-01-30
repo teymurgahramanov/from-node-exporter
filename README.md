@@ -11,7 +11,6 @@ While there are other tools like the Blackbox Exporter, the Node Probe Exporter 
 The Node Probe Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics, except ICMP probe, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
 ## Usage
-
 ### 1. Clone
 
 ```
@@ -56,3 +55,14 @@ Configuration snippet will be provided in Helm output upon the chart installatio
     action: replace
     target_label: instance
 ```
+
+## Run on local
+1. Get binary
+2. Configure targets in __config.yaml__
+3. Run
+```
+./from-node-exporter
+```
+
+## Contributing
+Contributions to enhance or fix issues are welcome. Feel free to submit pull requests.
