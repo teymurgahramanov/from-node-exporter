@@ -57,8 +57,25 @@ Configuration snippet will be provided in Helm output upon the chart installatio
 ```
 
 ## Run on local
-1. Get binary
+
+1. Download binary
+```
+https://github.com/teymurgahramanov/from-node-exporter/releases/download/v0.1.0/from-node-exporter
+```
 2. Configure targets in __config.yaml__
+```
+config:
+  targets:
+    - target1:
+        address: api.example.com:8080
+        module: tcp
+        timeout: 10
+    - target2:
+        address: https://example.com
+        module: http
+        interval: 60
+        timeout: 5
+```
 3. Run
 ```
 ./from-node-exporter
