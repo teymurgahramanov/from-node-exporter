@@ -6,6 +6,13 @@ The From-Node Exporter for Prometheus is designed to probe the accessibility of 
 
 While there are other tools like the Blackbox Exporter, the From-node Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
 
+Example case
+> In my org we have several k8s clusters and quite unreliable security 
+department, who has control over firewall and have a habbit of corrupting the rules on said firewall. 
+The confusion is immense. The issue is that at any point in time *one or 
+several nodes can lose access to one or several external resources*.
+https://www.mail-archive.com/prometheus-users@googlegroups.com/msg06409.html
+
 ## Current state
 
 The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics, except ICMP probe, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
