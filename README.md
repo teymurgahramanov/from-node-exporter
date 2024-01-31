@@ -21,25 +21,12 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 ### 1. Clone
 
 ```
-git clone --depth 1 --branch v0.1.0 https://github.com/teymurgahramanov/from-node-exporter
+git clone https://github.com/teymurgahramanov/from-node-exporter
 ```
 
 ### 2. Configure targets
 
-Configure targets using the Helm values file. Refer to [values.yaml](./chart/values.yaml). Example:
-```
-config:
-  targets:
-    - target1:
-        address: api.example.com:8080
-        module: tcp
-        timeout: 10
-    - target2:
-        address: https://example.com
-        module: http
-        interval: 60
-        timeout: 5
-```
+Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
 
 ### 3. Install Helm chart
 
@@ -63,30 +50,11 @@ Configuration snippet will be provided in Helm output upon the chart installatio
     target_label: instance
 ```
 
-## Run on local
+## Run binary
 
-1. Download binary
-```
-https://github.com/teymurgahramanov/from-node-exporter/releases/download/v0.1.0/from-node-exporter
-```
-2. Configure targets in __config.yaml__. Example:
-```
-config:
-  targets:
-    - target1:
-        address: api.example.com:8080
-        module: tcp
-        timeout: 10
-    - target2:
-        address: https://example.com
-        module: http
-        interval: 60
-        timeout: 5
-```
-3. Run
-```
-./from-node-exporter
-```
+1. Download from [the releases tab](https://github.com/teymurgahramanov/from-node-exporter/releases).
+2. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
+3. Run ```./from-node-exporter```
 
 ## Contributing
 Contributions to enhance or fix issues are welcome. Feel free to submit pull requests.
