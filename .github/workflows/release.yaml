@@ -46,6 +46,7 @@ jobs:
         with:
           name: ${{ inputs.release-name }}
           tag: ${{ inputs.release-name }}
+          body: ""
           artifacts: "bin/from-node-exporter"
           allowUpdates: true
           artifactErrorsFailBuild: true
