@@ -39,7 +39,7 @@ var (
 			Name: "probe_success",
 			Help: "Current status of the probe (1 for success, 0 for failure)",
 		},
-		[]string{"target", "module"},
+		[]string{"target", "module","address"},
 	)
 )
 
@@ -51,12 +51,12 @@ func worker(target string, module string, address string, interval int, timeout 
 		for {
 			result,error := modules.ProbeTCP(address,timeout)
 			if result {
-				probeStatus.WithLabelValues(target, module).Set(1)
+				probeStatus.WithLabelValues(target, module, address).Set(1)
 			} else {
 				if error != nil {
 					logger.Error(fmt.Sprintf(error.Error()),"target",target)
 				}
-				probeStatus.WithLabelValues(target, module).Set(0)
+				probeStatus.WithLabelValues(target, module, address).Set(0)
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
@@ -64,12 +64,12 @@ func worker(target string, module string, address string, interval int, timeout 
 		for {
 			result,error := modules.ProbeHTTP(address,timeout)
 			if result {
-				probeStatus.WithLabelValues(target, module).Set(1)
+				probeStatus.WithLabelValues(target, module, address).Set(1)
 			} else {
 				if error != nil {
 					logger.Error(fmt.Sprintf(error.Error()),"target",target)
 				}
-				probeStatus.WithLabelValues(target, module).Set(0)
+				probeStatus.WithLabelValues(target, module, address).Set(0)
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
