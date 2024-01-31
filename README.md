@@ -23,31 +23,33 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 
 By default metrics and their descriptions are available on ```:8080/metrics```.
 
-## Usage
+## Install
 
-### 1. Clone
+### Helm chart
+
+#### 1. Clone
 
 ```
 git clone https://github.com/teymurgahramanov/from-node-exporter
 ```
 
-### 2. Configure targets
+#### 2. Configure targets
 
 Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
 
-### 3. Install Helm chart
+#### 3. Install Helm chart
 
 ```
 # I'm sure you know how
 ```
 
-### 3. Configure Prometheus
+#### 3. Configure Prometheus
 
 Configuration snippet will be provided in Helm output upon the chart installation. Refer to [NOTES.txt](chart/templates/NOTES.txt).
 
-## Run binary
+### Binary
 
-1. Download from [the releases tab](https://github.com/teymurgahramanov/from-node-exporter/releases).
+1. Download binary from [the releases tab](https://github.com/teymurgahramanov/from-node-exporter/releases).
 2. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
 3. Run ```./from-node-exporter```
 
