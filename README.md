@@ -49,6 +49,8 @@ Configuration snippet will be provided in Helm output upon the chart installatio
     action: replace
     target_label: instance
 ```
+### 4. Get metrics
+By default metrics are accessible on ```:8080/metrics```
 
 ## Run binary
 
