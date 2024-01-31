@@ -26,7 +26,7 @@ git clone https://github.com/teymurgahramanov/from-node-exporter
 
 ### 2. Configure targets
 
-Configure targets using the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
+Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
 
 ### 3. Install Helm chart
 
