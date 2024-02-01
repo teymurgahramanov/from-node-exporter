@@ -26,7 +26,7 @@ By default metrics and their descriptions are available on ```:8080/metrics```.
 #### 1. Clone
 
 ```
-git clone https://github.com/teymurgahramanov/From-node-exporter
+git clone https://github.com/teymurgahramanov/from-node-exporter
 ```
 
 #### 2. Configure targets
@@ -45,9 +45,9 @@ Configuration snippet will be provided in Helm output upon the chart installatio
 
 ### Binary
 
-1. Download binary from [the releases tab](https://github.com/teymurgahramanov/From-node-exporter/releases).
+1. Download binary from [the releases tab](https://github.com/teymurgahramanov/from-node-exporter/releases).
 2. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
-3. Run ```./From-node-exporter```
+3. Run ```./from-node-exporter```
 
 ## Contributing
 Contributions to enhance or fix issues are welcome. Feel free to submit pull requests.
