@@ -34,16 +34,16 @@ type exporterConfig struct {
 }
 
 var (
-	probeStatus = prometheus.NewGaugeVec(
+	probeResult = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "probe_success",
+			Name: "probe_result",
 			Help: "Current status of the probe (1 for success, 0 for failure)",
 		},
 		[]string{"target", "module","address"},
 	)
 )
 
-func worker(target string, module string, address string, interval int, timeout int) bool {
+func probe(target string, module string, address string, interval int, timeout int) bool {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	
 	switch module {
@@ -51,12 +51,12 @@ func worker(target string, module string, address string, interval int, timeout 
 		for {
 			result,error := modules.ProbeTCP(address,timeout)
 			if result {
-				probeStatus.WithLabelValues(target, module, address).Set(1)
+				probeResult.WithLabelValues(target, module, address).Set(1)
 			} else {
 				if error != nil {
 					logger.Error(fmt.Sprintf(error.Error()),"target",target)
 				}
-				probeStatus.WithLabelValues(target, module, address).Set(0)
+				probeResult.WithLabelValues(target, module, address).Set(0)
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
@@ -64,12 +64,12 @@ func worker(target string, module string, address string, interval int, timeout 
 		for {
 			result,error := modules.ProbeHTTP(address,timeout)
 			if result {
-				probeStatus.WithLabelValues(target, module, address).Set(1)
+				probeResult.WithLabelValues(target, module, address).Set(1)
 			} else {
 				if error != nil {
 					logger.Error(fmt.Sprintf(error.Error()),"target",target)
 				}
-				probeStatus.WithLabelValues(target, module, address).Set(0)
+				probeResult.WithLabelValues(target, module, address).Set(0)
 			}
 			time.Sleep(time.Duration(interval) * time.Second)
 		}
@@ -110,7 +110,7 @@ func main() {
 	promRegistry := prometheus.NewRegistry()
 	prometheus.DefaultRegisterer = promRegistry
 	prometheus.DefaultGatherer = promRegistry
-	prometheus.MustRegister(probeStatus)
+	prometheus.MustRegister(probeResult)
 	
 	go func() {
 		http.Handle(config.Exporter.MetricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
@@ -131,7 +131,7 @@ func main() {
 					timeout = config.Exporter.DefaultProbeTimeout
 				}
 				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v with timeout of %v seconds.",target,address,interval,module,timeout))
-				worker(target, module, address, interval, timeout)
+				probe(target, module, address, interval, timeout)
 			}(key, value.Module, value.Address, value.Interval, value.Timeout)
 		}
 	}
