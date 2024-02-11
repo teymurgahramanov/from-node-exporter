@@ -1,6 +1,6 @@
 # From-node exporter
 
-The From-node Exporter for Prometheus is designed to probe the accessibility of external endpoints from each node of the Kubernetes cluster over TCP, HTTP, and ~~ICMP~~.
+The From-node Exporter for Prometheus is designed to probe the accessibility of external endpoints from each node of the Kubernetes cluster over TCP, HTTP, and ICMP.
 
 ## How will it be useful?
 
@@ -14,34 +14,14 @@ https://www.mail-archive.com/prometheus-users@googlegroups.com/msg06409.html
 
 ## Current state
 
-The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics, except ICMP probe, as other tools like the Blackbox Exporter are already comprehensive in their feature set.
-
-## Metrics
-
-By default metrics and their descriptions are available on ```:8080/metrics```.
+The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
 ## Install
 ### Helm chart
 
-#### 1. Clone
-
-```
-git clone https://github.com/teymurgahramanov/from-node-exporter
-```
-
-#### 2. Configure targets
-
-Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
-
-#### 3. Install Helm chart
-
-```
-# I'm sure you know how
-```
-
-#### 3. Configure Prometheus job
-
-Configuration snippet will be provided in Helm output upon the chart installation. Refer to [NOTES.txt](chart/templates/NOTES.txt).
+1. Clone
+2. Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
+3. Install Helm chart
 
 ### Binary
 
@@ -49,5 +29,17 @@ Configuration snippet will be provided in Helm output upon the chart installatio
 2. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
 3. Run ```./from-node-exporter```
 
+## Metrics
+
+By default metrics and their descriptions are available on ```:8080/metrics```.
+
+Configuration snippet for Prometheus job will be provided in Helm output upon the chart installation. Refer to [NOTES.txt](chart/templates/NOTES.txt).
+
+## Note
+-  __The ICMP probe requires elevated privileges to function__ \
+Refer to https://github.com/prometheus-community/pro-bing?tab=readme-ov-file#supported-operating-systems
+
+
 ## Contributing
+
 Contributions to enhance or fix issues are welcome. Feel free to submit pull requests.
