@@ -24,6 +24,11 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 3. Install Helm chart
 
 ### Docker
+1. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
+2. Run
+```
+docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:v0.2.0
+```
 
 ### Binary
 
