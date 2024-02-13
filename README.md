@@ -16,12 +16,14 @@ https://www.mail-archive.com/prometheus-users@googlegroups.com/msg06409.html
 
 The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
-## Install
-### Helm chart
+## Run
+### Kubernetes
 
-1. Clone
+1. Clone repo
 2. Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
 3. Install Helm chart
+
+### Docker
 
 ### Binary
 

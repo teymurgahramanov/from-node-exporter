@@ -10,6 +10,7 @@ func ProbeICMP(address string) (bool, error) {
 		return false, err
 	}
 	pinger.Count = 3
+// SET TIMEOUT
 	err = pinger.Run()
 	if err != nil {
 		return false, err
