@@ -26,9 +26,10 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 ### Docker
 1. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
 2. Run
-```
-docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:v0.2.0
-```
+
+    ```
+    docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:v0.2.0
+    ```
 
 ### Binary
 
@@ -40,7 +41,19 @@ docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-ex
 
 By default metrics and their descriptions are available on ```:8080/metrics```.
 
-Configuration snippet for Prometheus job will be provided in Helm output upon the chart installation. Refer to [NOTES.txt](chart/templates/NOTES.txt).
+Prometheus job example:
+```
+- job_name: from-node-exporter
+  kubernetes_sd_configs:
+    - role: endpoints
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_endpoints_name]
+      regex: from-node-exporter
+      action: keep
+    - source_labels: [__meta_kubernetes_endpoint_node_name]
+      action: replace
+      target_label: instance
+```
 
 ## Note
 -  __The ICMP probe requires elevated privileges to function__ \
