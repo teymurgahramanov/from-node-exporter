@@ -33,57 +33,11 @@ type exporterConfig struct {
 	DefaultProbeTimeout int `yaml:"defaultProbeTimeout"`
 }
 
-var (
-	probeStatus = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "probe_success",
-			Help: "Current status of the probe (1 for success, 0 for failure)",
-		},
-		[]string{"target", "module","address"},
-	)
-)
-
-func worker(target string, module string, address string, interval int, timeout int) bool {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	
-	switch module {
-	case "tcp":
-		for {
-			result,error := modules.ProbeTCP(address,timeout)
-			if result {
-				probeStatus.WithLabelValues(target, module, address).Set(1)
-			} else {
-				if error != nil {
-					logger.Error(fmt.Sprintf(error.Error()),"target",target)
-				}
-				probeStatus.WithLabelValues(target, module, address).Set(0)
-			}
-			time.Sleep(time.Duration(interval) * time.Second)
-		}
-	case "http":
-		for {
-			result,error := modules.ProbeHTTP(address,timeout)
-			if result {
-				probeStatus.WithLabelValues(target, module, address).Set(1)
-			} else {
-				if error != nil {
-					logger.Error(fmt.Sprintf(error.Error()),"target",target)
-				}
-				probeStatus.WithLabelValues(target, module, address).Set(0)
-			}
-			time.Sleep(time.Duration(interval) * time.Second)
-		}
-	default:
-		logger.Error("Wrong module","target",target)
-		return false
-	}
-}
-
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	targetsFileName := "config.yaml"
+	configFile := "config.yaml"
 
-	data, err := os.ReadFile(targetsFileName)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		logger.Error(fmt.Sprint(err))
 	}
@@ -107,10 +61,20 @@ func main() {
 		config.Exporter.DefaultProbeTimeout = 5
 	}
 
+	var (
+		probeResult = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "probe_result",
+				Help: "Current status of the probe (1 for success, 0 for failure)",
+			},
+			[]string{"target", "module","address"},
+		)
+	)
+
 	promRegistry := prometheus.NewRegistry()
 	prometheus.DefaultRegisterer = promRegistry
 	prometheus.DefaultGatherer = promRegistry
-	prometheus.MustRegister(probeStatus)
+	prometheus.MustRegister(probeResult)
 	
 	go func() {
 		http.Handle(config.Exporter.MetricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
@@ -130,11 +94,42 @@ func main() {
 				if timeout == 0 {
 					timeout = config.Exporter.DefaultProbeTimeout
 				}
-				logger.Info(fmt.Sprintf("Starting probe %v at address %v for every %v seconds using module %v with timeout of %v seconds.",target,address,interval,module,timeout))
-				worker(target, module, address, interval, timeout)
+				targetLogger := logger.With(slog.String("target",target))
+				resultHandler := func(result bool, err error) {
+					if result {
+						targetLogger.Info("OK")
+						probeResult.WithLabelValues(target, module, address).Set(1)
+					} else {
+							if err != nil {
+								targetLogger.Error(fmt.Sprint(err.Error()))
+							}
+							probeResult.WithLabelValues(target, module, address).Set(0)
+					}
+				}
+				switch module {
+					case "tcp":
+						for {
+							result,err := modules.ProbeTCP(address,timeout)
+							resultHandler(result,err)
+							time.Sleep(time.Duration(interval) * time.Second)
+						}
+					case "http":
+						for {
+							result,err := modules.ProbeHTTP(address,timeout)
+							resultHandler(result,err)
+							time.Sleep(time.Duration(interval) * time.Second)
+						}
+					case "icmp":
+						for {
+							result,err := modules.ProbeICMP(address)
+							resultHandler(result,err)
+							time.Sleep(time.Duration(interval) * time.Second)
+						}
+					default:
+						targetLogger.Error("Unknown module")
+				}
 			}(key, value.Module, value.Address, value.Interval, value.Timeout)
 		}
 	}
-	
 	wg.Wait()
 }
