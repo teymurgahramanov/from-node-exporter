@@ -38,7 +38,38 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 3. Run ```./from-node-exporter```
 
 ## config.yaml
+| Field | Description  | Type  | Default
+|:-:|:-:|:-:|:-:
+| exporter.metricsListenPort  | | Integer | 8080
+| exporter.metricsListenPath  |   | String  | /metrics
+| exporter.defaultProbeInterval  | Default interval between probes in seconds | Integer   | 22
+| exporter.defaultProbeTimeout  | Default timeout for probes in seconds | Integer   | 22
+| targets  | List of targets to probe | List |
+| targets.[].address  | Target address. Can be URL, IP, or IP:PORT depending on chosen module | String |
+| targets.[].module  | http,tcp or icmp| String |
+| targets.[].interval  | | Integer | exporter.defaultProbeInterval
+| targets.[].timeout  | | Integer | exporter.defaultProbeTimeout
 
+Example:
+```
+exporter:
+  metricsListenPort: 3333
+  metricsListenPath: /metricz
+  defaultProbeInterval: 31
+  defaultProbeTimeout: 13
+targets:
+  - target1:
+      address: api.example.com:8080
+      module: tcp
+      timeout: 15
+  - target2:
+      address: https://example.com
+      module: http
+      interval: 60
+  - target3:
+      address: 192.168.0.1
+      module: icmp
+```
 ## Metrics
 
 By default metrics and their descriptions are available on ```:8080/metrics```.
