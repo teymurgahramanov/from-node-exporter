@@ -20,11 +20,11 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 ### Kubernetes
 
 1. Clone repo
-2. Configure targets in the Helm values file. Refer to [example.config.yaml](./example.config.yaml).
+2. Create config.yaml
 3. Install Helm chart
 
 ### Docker
-1. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
+1. Create config.yaml
 2. Run
 
     ```
@@ -33,9 +33,11 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 
 ### Binary
 
-1. Download binary from [the releases tab](https://github.com/teymurgahramanov/from-node-exporter/releases).
-2. Configure targets in __config.yaml__. Refer to [example.config.yaml](./example.config.yaml).
+1. Download binary from [the releases tab](https://github.com/teymurgahramanov/from-node-exporter/releases)
+2. Create config.yaml
 3. Run ```./from-node-exporter```
+
+## config.yaml
 
 ## Metrics
 
@@ -58,6 +60,7 @@ Prometheus job example:
 ## Note
 -  __The ICMP probe requires elevated privileges to function__ \
 Refer to https://github.com/prometheus-community/pro-bing?tab=readme-ov-file#supported-operating-systems
+
 
 
 ## Contributing
