@@ -6,11 +6,7 @@ The From-node Exporter for Prometheus is designed to probe the accessibility of 
 
 While there are other tools like the Blackbox Exporter, the From-node Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
 
-For instance, consider a situation where your pods were evicted to a different server because of a node failure. The node has been added to the cluster recently. However, it resulted in errors and service unavailability because of the lack of access to essential external endpoints. It turned out that the security department did not apply access rules to new cluster nodes. 
-
-Or another case ...
-> In my org we have several k8s clusters and quite unreliable security department, who has control over firewall and have a habbit of corrupting the rules on said firewall. The confusion is immense. The issue is that at any point in time *one or several nodes can lose access to one or several external resources*.
-https://www.mail-archive.com/prometheus-users@googlegroups.com/msg06409.html
+Consider a scenario where your pods were evicted due to a node failure. The pods were then moved to new nodes that were recently added to the cluster. However, this resulted in errors and service unavailability due to a lack of access to essential external endpoints. Later, it was discovered that the security department failed to apply access rules to the new cluster nodes. This is just one example of how node-level probes can help you identify potential issues before they become major problems.
 
 ## Current state
 
