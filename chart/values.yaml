@@ -1,7 +1,7 @@
 image:
   repository: teymurgahramanov/from-node-exporter
   pullPolicy: IfNotPresent
-  tag: "" # Default is "{{ $.Chart.AppVersion }}"
+  tag: v0.2.0
 config:
   exporter: {}
   targets: {}
