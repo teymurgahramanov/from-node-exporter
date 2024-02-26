@@ -16,9 +16,7 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 
 ### Kubernetes
 
-1. Clone repo
-2. Create config.yaml
-3. Install Helm chart
+Set values and install Helm [chart](./chart/).
 
 ### Docker
 
