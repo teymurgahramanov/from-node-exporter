@@ -88,7 +88,7 @@ Prometheus job example:
 
 ## Note
 
--s __The ICMP probe requires elevated privileges to function__ \
+- __The ICMP probe requires elevated privileges to function__ \
 Refer to https://github.com/prometheus-community/pro-bing?tab=readme-ov-file#supported-operating-systems
 
 ## Contributing
