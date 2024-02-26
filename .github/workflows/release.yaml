@@ -23,7 +23,7 @@ jobs:
           go-version: 1.21.6
 
       - name: Build
-        run: CGO_ENABLED=0 GOOS=linux go build -o bin/from-node-exporter
+        run: CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -o bin/from-node-exporter
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -39,14 +39,14 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ github.repository }}:${{ inputs.release-name }}
+          tags: ${{ github.repository }}:${{ inputs.release-name }},${{ github.repository }}:latest
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           name: ${{ inputs.release-name }}
           tag: ${{ inputs.release-name }}
-          body: ""
+          bodyFile: "CHANGELOG.md"
           artifacts: "bin/from-node-exporter"
           allowUpdates: true
           artifactErrorsFailBuild: true

@@ -6,29 +6,25 @@ The From-node Exporter for Prometheus is designed to probe the accessibility of 
 
 While there are other tools like the Blackbox Exporter, the From-node Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
 
-For instance, consider a situation where your pods were evicted to a different server because of a node failure. The node has been added to the cluster recently. However, it resulted in errors and service unavailability because of the lack of access to essential external endpoints. It turned out that the security department had recently performed firewall maintenance and an error was made in configuring access rules that affected new cluster nodes. 
-
-Or another case ...
-> In my org we have several k8s clusters and quite unreliable security department, who has control over firewall and have a habbit of corrupting the rules on said firewall. The confusion is immense. The issue is that at any point in time *one or several nodes can lose access to one or several external resources*.
-https://www.mail-archive.com/prometheus-users@googlegroups.com/msg06409.html
+Consider a scenario where your pods were evicted due to a node failure. The pods were then moved to new nodes that were recently added to the cluster. However, this resulted in errors and service unavailability due to a lack of access to essential external endpoints. Later, it was discovered that the security department failed to apply access rules to the new cluster nodes. This is just one example of how node-level probes can help you identify potential issues before they become major problems.
 
 ## Current state
 
 The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics as other tools like the Blackbox Exporter are already comprehensive in their feature set.
 
 ## Run
+
 ### Kubernetes
 
-1. Clone repo
-2. Create config.yaml
-3. Install Helm chart
+Set values and install Helm [chart](./chart/).
 
 ### Docker
+
 1. Create config.yaml
 2. Run
 
     ```
-    docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:v0.2.0
+    docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:latest
     ```
 
 ### Binary
@@ -38,6 +34,7 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 3. Run ```./from-node-exporter```
 
 ## config.yaml
+
 | Field | Description  | Type  | Default
 |:-:|:-:|:-:|:-:
 | exporter.metricsListenPort  | | Integer | 8080
@@ -70,6 +67,7 @@ targets:
       address: 192.168.0.1
       module: icmp
 ```
+
 ## Metrics
 
 By default metrics and their descriptions are available on ```:8080/metrics```.
@@ -89,10 +87,9 @@ Prometheus job example:
 ```
 
 ## Note
--  __The ICMP probe requires elevated privileges to function__ \
+
+-s __The ICMP probe requires elevated privileges to function__ \
 Refer to https://github.com/prometheus-community/pro-bing?tab=readme-ov-file#supported-operating-systems
-
-
 
 ## Contributing
 
