@@ -2,7 +2,7 @@ apiVersion: v2
 name: from-node-exporter
 description: A Helm chart for Prometheus from-node-exporter
 type: application
-version: 1.0.1
+version: 1.0.0
 appVersion: "v0.2.0"
 home: https://github.com/teymurgahramanov/from-node-exporter
 sources:
