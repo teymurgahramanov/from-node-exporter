@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ github.repository }}:${{ inputs.release-name }}
+          tags: ${{ github.repository }}:${{ inputs.release-name }},${{ github.repository }}:latest
 
       - name: Create Release
         uses: ncipollo/release-action@v1
