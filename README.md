@@ -24,7 +24,7 @@ Set values and install Helm [chart](./chart/).
 2. Run
 
     ```
-    docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:v0.2.0
+    docker run --rm -v $(pwd)/config.yaml:/config.yaml teymurgahramanov/from-node-exporter:latest
     ```
 
 ### Binary
