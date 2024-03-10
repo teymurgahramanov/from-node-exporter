@@ -95,7 +95,7 @@ func main() {
 					timeout = config.Exporter.DefaultProbeTimeout
 				}
 				targetLogger := logger.With(slog.String("target",target))
-				resultHandler := func(result bool, err error) {
+				resultHandler := func(result bool, err error, interval int) {
 					if result {
 						targetLogger.Info("OK")
 						probeResult.WithLabelValues(target, module, address).Set(1)
@@ -105,25 +105,23 @@ func main() {
 							}
 							probeResult.WithLabelValues(target, module, address).Set(0)
 					}
+					time.Sleep(time.Duration(interval) * time.Second)
 				}
 				switch module {
 					case "tcp":
 						for {
 							result,err := modules.ProbeTCP(address,timeout)
-							resultHandler(result,err)
-							time.Sleep(time.Duration(interval) * time.Second)
+							resultHandler(result,err,interval)
 						}
 					case "http":
 						for {
 							result,err := modules.ProbeHTTP(address,timeout)
-							resultHandler(result,err)
-							time.Sleep(time.Duration(interval) * time.Second)
+							resultHandler(result,err,interval)
 						}
 					case "icmp":
 						for {
 							result,err := modules.ProbeICMP(address)
-							resultHandler(result,err)
-							time.Sleep(time.Duration(interval) * time.Second)
+							resultHandler(result,err,interval)
 						}
 					default:
 						targetLogger.Error("Unknown module")
