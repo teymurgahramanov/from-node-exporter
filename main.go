@@ -41,7 +41,7 @@ type checkRequest struct {
 }
 
 type checkResponse struct {
-	Result int    `json:"result"`
+	Result bool   `json:"result"`
 	Error  string `json:"error,omitempty"`
 }
 
@@ -95,25 +95,24 @@ func main() {
 			return
 		}
 
-		var req checkRequest
-		err := json.NewDecoder(r.Body).Decode(&req)
+		var request checkRequest
+		err := json.NewDecoder(r.Body).Decode(&request)
 		if err != nil {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
 		}
 
-		timeout := req.Timeout
+		timeout := request.Timeout
 		if timeout == 0 {
 			timeout = config.Exporter.DefaultProbeTimeout
 		}
 
 		resultHandler := func(result bool, err error) {
-			response := checkResponse {
-        Result: 0,
-    	}
+			var response checkResponse
+			response.Result = false
 			if result {
 				logger.Info("OK")
-				response.Result = 1
+				response.Result = true
 			} else {
 					if err != nil {
 						logger.Error(fmt.Sprint(err.Error()))
@@ -124,15 +123,15 @@ func main() {
 			json.NewEncoder(w).Encode(response)
 		}
 
-		switch req.Module {
+		switch request.Module {
 		case "tcp":
-				result, err := modules.ProbeTCP(req.Address, timeout)
+				result, err := modules.ProbeTCP(request.Address, timeout)
 				resultHandler(result, err)
 		case "http":
-				result, err := modules.ProbeHTTP(req.Address, timeout)
+				result, err := modules.ProbeHTTP(request.Address, timeout)
 				resultHandler(result, err)
 		case "icmp":
-				result, err := modules.ProbeICMP(req.Address)
+				result, err := modules.ProbeICMP(request.Address)
 				resultHandler(result, err)
 		default:
 				logger.Error("Unknown module")
