@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -31,6 +32,17 @@ type exporterConfig struct {
 	MetricsListenPort int `yaml:"metricsListenPort"`
 	DefaultProbeInterval int `yaml:"defaultProbeInterval"`
 	DefaultProbeTimeout int `yaml:"defaultProbeTimeout"`
+}
+
+type checkRequest struct {
+	Module  string `json:"module"`
+	Address string `json:"address"`
+	Timeout int    `json:"timeout"`
+}
+
+type checkResponse struct {
+	Result int    `json:"result"`
+	Error  string `json:"error,omitempty"`
 }
 
 func main() {
@@ -76,11 +88,62 @@ func main() {
 	prometheus.DefaultGatherer = promRegistry
 	prometheus.MustRegister(probeResult)
 	
+	http.Handle(config.Exporter.MetricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
+	http.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req checkRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+
+		timeout := req.Timeout
+		if timeout == 0 {
+			timeout = config.Exporter.DefaultProbeTimeout
+		}
+
+		resultHandler := func(result bool, err error) {
+			response := checkResponse {
+        Result: 0,
+    	}
+			if result {
+				logger.Info("OK")
+				response.Result = 1
+			} else {
+					if err != nil {
+						logger.Error(fmt.Sprint(err.Error()))
+					}
+					response.Error = err.Error()
+			}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}
+
+		switch req.Module {
+		case "tcp":
+				result, err := modules.ProbeTCP(req.Address, timeout)
+				resultHandler(result, err)
+		case "http":
+				result, err := modules.ProbeHTTP(req.Address, timeout)
+				resultHandler(result, err)
+		case "icmp":
+				result, err := modules.ProbeICMP(req.Address)
+				resultHandler(result, err)
+		default:
+				logger.Error("Unknown module")
+				http.Error(w, "Unknown module", http.StatusBadRequest)
+				return
+		}
+	})		
 	go func() {
-		http.Handle(config.Exporter.MetricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
 		http.ListenAndServe(":"+fmt.Sprint(config.Exporter.MetricsListenPort), nil)
 	}()
-	
+
 	var wg sync.WaitGroup
 
 	for _, entry := range config.Targets {
