@@ -41,11 +41,11 @@ Set values and install Helm [chart](./chart/).
 | exporter.metricsListenPath  |   | String  | /metrics
 | exporter.defaultProbeInterval  | Default interval between probes in seconds | Integer   | 22
 | exporter.defaultProbeTimeout  | Default timeout for probes in seconds | Integer   | 22
-| targets  | List of targets to probe | List |
-| targets.[].address  | Target address. Can be URL, IP, or IP:PORT depending on chosen module | String |
-| targets.[].module  | http,tcp or icmp| String |
-| targets.[].interval  | | Integer | exporter.defaultProbeInterval
-| targets.[].timeout  | | Integer | exporter.defaultProbeTimeout
+| targets  | KVs of targets to probe | List |
+| targets."target".address  | Target address. Can be URL, IP, or IP:PORT depending on chosen module | String |
+| targets."target".module  | Module to probe the target (tcp, http, icmp) | String |
+| targets."target".interval  | Probe interval for the target | Integer | exporter.defaultProbeInterval
+| targets."target".timeout  | Probe timeout for the target | Integer | exporter.defaultProbeTimeout
 
 Example:
 ```
@@ -55,17 +55,17 @@ exporter:
   defaultProbeInterval: 31
   defaultProbeTimeout: 13
 targets:
-  - target1:
-      address: api.example.com:8080
-      module: tcp
-      timeout: 15
-  - target2:
-      address: https://example.com
-      module: http
-      interval: 60
-  - target3:
-      address: 192.168.0.1
-      module: icmp
+  target1:
+    address: api.example.com:8080
+    module: tcp
+    timeout: 15
+  target2:
+    address: https://example.com
+    module: http
+    interval: 60
+  target3:
+    address: 192.168.0.1
+    module: icmp
 ```
 
 ## Metrics

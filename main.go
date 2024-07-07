@@ -16,7 +16,7 @@ import (
 )
 
 type configuration struct {
-	Targets []map[string]targetConfig `yaml:"targets"`
+	Targets map[string]targetConfig `yaml:"targets"`
 	Exporter exporterConfig `yaml:"exporter"`
 }
 
@@ -145,51 +145,49 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	for _, entry := range config.Targets {
-		for key, value := range entry {
-			wg.Add(1)
-			go func(target string, module string, address string, interval int, timeout int) {
-				defer wg.Done()
-				if interval == 0 {
-					interval = config.Exporter.DefaultProbeInterval
+	for key, value := range config.Targets {
+		wg.Add(1)
+		go func(target string, module string, address string, interval int, timeout int) {
+			defer wg.Done()
+			if interval == 0 {
+				interval = config.Exporter.DefaultProbeInterval
+			}
+			if timeout == 0 {
+				timeout = config.Exporter.DefaultProbeTimeout
+			}
+			targetLogger := logger.With(slog.String("target",target))
+			resultHandler := func(result bool, err error, interval int) {
+				if result {
+					targetLogger.Info("OK")
+					probeResult.WithLabelValues(target, module, address).Set(1)
+				} else {
+						if err != nil {
+							targetLogger.Error(fmt.Sprint(err.Error()))
+						}
+						probeResult.WithLabelValues(target, module, address).Set(0)
 				}
-				if timeout == 0 {
-					timeout = config.Exporter.DefaultProbeTimeout
-				}
-				targetLogger := logger.With(slog.String("target",target))
-				resultHandler := func(result bool, err error, interval int) {
-					if result {
-						targetLogger.Info("OK")
-						probeResult.WithLabelValues(target, module, address).Set(1)
-					} else {
-							if err != nil {
-								targetLogger.Error(fmt.Sprint(err.Error()))
-							}
-							probeResult.WithLabelValues(target, module, address).Set(0)
+				time.Sleep(time.Duration(interval) * time.Second)
+			}
+			switch module {
+				case "tcp":
+					for {
+						result,err := modules.ProbeTCP(address,timeout)
+						resultHandler(result,err,interval)
 					}
-					time.Sleep(time.Duration(interval) * time.Second)
-				}
-				switch module {
-					case "tcp":
-						for {
-							result,err := modules.ProbeTCP(address,timeout)
-							resultHandler(result,err,interval)
-						}
-					case "http":
-						for {
-							result,err := modules.ProbeHTTP(address,timeout)
-							resultHandler(result,err,interval)
-						}
-					case "icmp":
-						for {
-							result,err := modules.ProbeICMP(address)
-							resultHandler(result,err,interval)
-						}
-					default:
-						targetLogger.Error("Unknown module")
-				}
-			}(key, value.Module, value.Address, value.Interval, value.Timeout)
-		}
+				case "http":
+					for {
+						result,err := modules.ProbeHTTP(address,timeout)
+						resultHandler(result,err,interval)
+					}
+				case "icmp":
+					for {
+						result,err := modules.ProbeICMP(address)
+						resultHandler(result,err,interval)
+					}
+				default:
+					targetLogger.Error("Unknown module")
+			}
+		}(key, value.Module, value.Address, value.Interval, value.Timeout)
 	}
 	wg.Wait()
 }
