@@ -2,7 +2,7 @@
 
 ### Added
 
-- Instant-probes `/probe`. Now it's possible to instantly probe particular targets besides configured ones. More at [README.md](./README.md).
+- Instant-probes `/probe`. Now it's possible to probe individual targets instantly. More at [README.md](./README.md).
 
 ### Changed
 

@@ -73,7 +73,7 @@ targets:
 ```
 
 ## Instant probes
-Instant probes are useful to check that some targets besides configured ones are accessible. It's performed by making a POST request to `/probe`.
+Useful to check the availability of individual targets besides configured ones instantly. It's performed by making a POST request to `/probe`.
 
 In the case of Kubernetes, it can be leveraged to perform instant probes from all nodes at once instead of doing it one by one.
 
