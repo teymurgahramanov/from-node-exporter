@@ -34,13 +34,13 @@ type exporterConfig struct {
 	DefaultProbeTimeout int `yaml:"defaultProbeTimeout"`
 }
 
-type checkRequest struct {
+type probeRequest struct {
 	Module  string `json:"module"`
 	Address string `json:"address"`
 	Timeout int    `json:"timeout"`
 }
 
-type checkResponse struct {
+type probeResponse struct {
 	Result bool   `json:"result"`
 	Error  string `json:"error,omitempty"`
 }
@@ -89,13 +89,13 @@ func main() {
 	prometheus.MustRegister(probeResult)
 	
 	http.Handle(config.Exporter.MetricsListenPath, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
-	http.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/probe", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 			return
 		}
 
-		var request checkRequest
+		var request probeRequest
 		err := json.NewDecoder(r.Body).Decode(&request)
 		if err != nil {
 			http.Error(w, "Bad request", http.StatusBadRequest)
@@ -108,7 +108,7 @@ func main() {
 		}
 
 		resultHandler := func(result bool, err error) {
-			var response checkResponse
+			var response probeResponse
 			response.Result = false
 			if result {
 				logger.Info("OK")

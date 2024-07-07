@@ -6,7 +6,11 @@ The From-node Exporter for Prometheus is designed to probe the accessibility of 
 
 While there are other tools like the Blackbox Exporter, the From-node Exporter focuses specifically on simplicity and efficiency for Kubernetes node-level probing. It's designed to serve a specific use case - ensuring all required endpoints are accessible from every node of your cluster.
 
-Consider a scenario where your pods were evicted due to a node failure. The pods were then moved to new nodes that were recently added to the cluster. However, this resulted in errors and service unavailability due to a lack of access to essential external endpoints. Later, it was discovered that the security department failed to apply access rules to the new cluster nodes. This is just one example of how node-level probes can help you identify potential issues before they become major problems.
+
+### Use case
+Consider a scenario where your pods were evicted due to a node failure. The pods were then moved to new nodes that were recently added to the cluster. However, this resulted in errors and service unavailability due to a lack of access to essential external endpoints. Later, it was discovered that the security department failed to apply access rules to the new cluster nodes. 
+
+And this is just one example of how node-level probes can help you identify potential issues before they become major problems.
 
 ## Current state
 
@@ -16,7 +20,7 @@ The From-node Exporter is intentionally kept simple. Currently, no plans are in 
 
 ### Kubernetes
 
-Set values and install Helm [chart](./chart/).
+Install Helm [chart](./chart/).
 
 ### Docker
 
@@ -66,6 +70,29 @@ targets:
   target3:
     address: 192.168.0.1
     module: icmp
+```
+
+## Instant probes
+Instant probes are useful to check that some targets besides configured ones are accessible. It's performed by making a POST request to `/probe`.
+
+In the case of Kubernetes, it can be leveraged to perform instant probes from all nodes at once instead of doing it one by one.
+
+### Example
+Here is the example of probe using `http` module.
+
+Request body
+```
+{
+    "module": "http", 
+    "address": "http://192.168.0.107:5000",
+    "timeout": 1 # Optional
+}
+```
+Response body
+```
+{
+    "result": true # or false
+}
 ```
 
 ## Metrics

@@ -1,3 +1,13 @@
+## [0.3.0] - 2024-07-08
+
+### Added
+
+- Instant-probes `/probe`. Now it's possible to instantly probe particular targets besides configured ones. More at [README.md](./README.md).
+
+### Changed
+
+- Configuration structure from list to KV
+
 # Changelog
 
 ## [0.2.1] - 2024-03-10
