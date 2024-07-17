@@ -1,8 +1,8 @@
-## [0.3.0] - 2024-07-08
+## [0.3.0] - 2024-07-17
 
 ### Added
 
-- Instant-probes `/probe`. Now it's possible to probe individual targets instantly. More at [README.md](./README.md).
+- Instant probes. Now it's possible to probe individual targets instantly using API `/probe`. More at [README.md](./README.md).
 
 ### Changed
 
