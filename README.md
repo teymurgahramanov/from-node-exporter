@@ -10,11 +10,7 @@ While there are other tools like the Blackbox Exporter, the From-node Exporter f
 ### Use case
 Consider a scenario where your pods were evicted due to a node failure. The pods were then moved to new nodes that were recently added to the cluster. However, this resulted in errors and service unavailability due to a lack of access to essential external endpoints. Later, it was discovered that the security department failed to apply access rules to the new cluster nodes. 
 
-And this is just one example of how node-level probes can help you identify potential issues before they become major problems.
-
-## Current state
-
-The From-node Exporter is intentionally kept simple. Currently, no plans are in place to add additional functionality or metrics as other tools like the Blackbox Exporter are already comprehensive in their feature set.
+This is just one example of how node-level probes can help you identify potential issues before they become major problems.
 
 ## Run
 
@@ -75,7 +71,7 @@ targets:
 ## Instant probes
 Useful to check the availability of individual targets besides configured ones instantly. It's performed by making a POST request to `/probe`.
 
-In the case of Kubernetes, it can be leveraged to perform instant probes from all nodes at once instead of doing it one by one. Try [KubePing](https://github.com/teymurgahramanov/KubePing)
+In the case of Kubernetes, it can be leveraged to perform instant probes from all nodes at once instead of doing it one by one. Try [KubePing](https://github.com/teymurgahramanov/KubePing).
 
 ### Example
 Here is the example of probe using `http` module.
