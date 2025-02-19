@@ -71,7 +71,7 @@ targets:
 ## Instant probes
 Useful to check the availability of individual targets besides configured ones instantly. It's performed by making a POST request to `/probe`.
 
-In the case of Kubernetes, it can be leveraged to perform instant probes from all nodes at once instead of doing it one by one. Try [KubePing](https://github.com/teymurgahramanov/KubePing).
+In the case of Kubernetes, it can be leveraged to perform instant probes from all nodes at once instead of doing it one by one. For better experience try [KubePing](https://github.com/teymurgahramanov/KubePing).
 
 ### Example
 Here is the example of probe using `http` module.
